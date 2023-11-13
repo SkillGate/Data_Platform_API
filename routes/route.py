@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Request, Query
 from schema.schemas import affindaPDF
-from schema.gitHubSchemas import gitHubOutsideCollaborators
+from schema.gitHubSchemas import github_collaborators_commit_count
+from schema.gitHubSchemas import github_collaborators_commit_details
 from config.database import collection_name
 
 
@@ -11,16 +12,18 @@ async def upload_file(fileUrl: str = Query(..., description="Description of para
     result  = affindaPDF(fileUrl=fileUrl)
     return result;
 
-# GET Request Method
-@router.get("/health")
-async def get_todos():
-    # todos = list_serial(collection_name.find())
-    return "Health Endpoint";
-
-@router.get("/gitHub/outsideCollaborators")
+@router.get("/github/collaboratorscommitcount")
 async def upload_file(gitHubUrl: str = Query(..., description="Description of param1")):
     try:
-        result = gitHubOutsideCollaborators(gitHubUrl=gitHubUrl)
+        result = github_collaborators_commit_count(gitHubUrl=gitHubUrl)
+        return result
+    except Exception as e:
+        return {"error": str(e)}
+    
+@router.get("/github/collaboratorscommmitdetails")
+async def upload_file(gitHubUrl: str = Query(..., description="Description of param1")):
+    try:
+        result = github_collaborators_commit_details(gitHubUrl=gitHubUrl)
         return result
     except Exception as e:
         return {"error": str(e)}
