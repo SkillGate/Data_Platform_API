@@ -78,23 +78,6 @@ def affindaPDF(fileUrl):
         print("Error:", str(e))
         return str(e)
 
-    #collection_name.insert_one(dict({"CV": data}))
-
-    
-    
-    
-
-    # writing to a csv file.
-
-    # record=[softSkills,hardSkills,educationSet,workExperience]
-
-    # csvFile="data.csv"
-
-    # with open(csvFile, mode='a', newline='') as file:
-    #     writer = csv.writer(file)
-
-
-    #     writer.writerow(record)
 
 
 
