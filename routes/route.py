@@ -1,7 +1,9 @@
-from fastapi import APIRouter, Request, Query
+from fastapi import APIRouter, HTTPException, Request, Query
 # from schema.schemas import affindaPDF
 from schema.gitHubSchemas import github_collaborators_commit_count
 from schema.gitHubSchemas import github_collaborators_commit_details
+from schema.gitHubSchemas import github_organization_languages
+from schema.gitHubSchemas import github_user_profile_info
 from schema.mediumBlogSchemas import extract_blogger_posts
 # from config.database import collection_name
 
@@ -13,7 +15,7 @@ router = APIRouter()
 #     result  = affindaPDF(fileUrl=fileUrl)
 #     return result;
 
-@router.get("/github/collaboratorscommitcount")
+@router.get("/github/collaboratorsCommitCount")
 async def upload_file(gitHubUrl: str = Query(..., description="Description of param1")):
     try:
         result = github_collaborators_commit_count(gitHubUrl=gitHubUrl)
@@ -21,13 +23,29 @@ async def upload_file(gitHubUrl: str = Query(..., description="Description of pa
     except Exception as e:
         return {"error": str(e)}
     
-@router.get("/github/collaboratorscommmitdetails")
+@router.get("/github/collaboratorsCommitDetails")
 async def upload_file(gitHubUrl: str = Query(..., description="Description of param1")):
     try:
         result = github_collaborators_commit_details(gitHubUrl=gitHubUrl)
         return result
     except Exception as e:
         return {"error": str(e)}
+    
+@router.get("/github/organizationLanguages")
+async def upload_file(gitHubUrl: str = Query(..., description="Description of param1")):
+    try:
+        result = github_organization_languages(gitHubUrl=gitHubUrl)
+        return result
+    except Exception as e:
+        return {"error": str(e)}
+    
+@router.get("/github/userInfo")
+async def upload_file(gitHubUrl: str = Query(..., description="Description of param1")):
+    try:
+        result = github_user_profile_info(gitHubUrl=gitHubUrl)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=404, detail="User not found")
     
 @router.get("/blogger/posts")
 async def blogger_post(bloggerUrl: str = Query(..., description="Description of param1")):
