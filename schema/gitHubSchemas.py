@@ -1,52 +1,16 @@
 import os
 import requests
-from urllib.parse import urlparse  # Add this import statement
+from urllib.parse import urlparse
 from dotenv import load_dotenv
+from constants.gitHubConstants import get_contributors
+from constants.gitHubConstants import get_commit_details
+from constants.gitHubConstants import get_commits
+from constants.gitHubConstants import get_organization_repositories
+from constants.gitHubConstants import get_repository_languages
+from constants.gitHubConstants import get_github_user_profile_info
 
-def get_contributors(username, repo, access_token):
-    contributors_url = f"https://api.github.com/repos/{username}/{repo}/contributors"
-    headers = {'Authorization': f'token {access_token}'}
-    try:
-        response = requests.get(contributors_url, headers=headers)
-        response.raise_for_status() 
-        contributors = response.json()
-        return contributors
-    except requests.exceptions.HTTPError as errh:
-        print ("Http Error:",errh)
-    except requests.exceptions.ConnectionError as errc:
-        print ("Error Connecting:",errc)
-    except requests.exceptions.Timeout as errt:
-        print ("Timeout Error:",errt)
-    except requests.exceptions.RequestException as err:
-        print ("OOps: Something went wrong",err)
-    return []
-
-def get_commit_details(username, repo, sha, access_token):
-    commit_url = f"https://api.github.com/repos/{username}/{repo}/commits/{sha}"
-    headers = {'Authorization': f'token {access_token}'}
-    response = requests.get(commit_url, headers=headers)
-    commit_details = response.json()
-    return commit_details
-
-def get_commits(username, repo, contributor_username, access_token):
-    commits_url = f"https://api.github.com/repos/{username}/{repo}/commits"
-    params = {'author': contributor_username}
-    headers = {'Authorization': f'token {access_token}'}
-    response = requests.get(commits_url, headers=headers, params=params)
-    commits = response.json()
-    return commits
-
-def get_organization_repositories(organization, access_token):
-    url = f"https://api.github.com/orgs/{organization}/repos"
-    headers = {'Authorization': f'token {access_token}'}
-    
-    response = requests.get(url, headers=headers)
-    
-    if response.status_code == 200:
-        repositories = [repo['name'] for repo in response.json()]
-        return repositories
-    else:
-        raise Exception(f"Failed to retrieve repositories. Status code: {response.status_code}, Response: {response.text}")
+load_dotenv()
+github_access_token = os.getenv('GitHub_API_KEY')
 
 def extract_username_repo(github_url):
     url_parts = urlparse(github_url)
@@ -182,14 +146,51 @@ def extract_contributors_commits_details(github_url, access_token):
             
     return get_contributors_commits_details(repositories_data)
 
-def github_collaborators_commit_count(gitHubUrl):
-    github_repo_url = gitHubUrl 
-    github_access_token = os.getenv('GitHub_API_KEY')
+def extract_repository_languages(github_url, access_token):
+    username, repo = extract_username_repo(github_url)
 
-    return extract_contributors_commits_count(github_repo_url, github_access_token)
+    repositories_data = {}
+
+    # Check if the provided URL is an organization link
+    if repo == '':
+        repositories = get_organization_repositories(username, access_token)
+    else:
+        repositories = [repo]
+
+    for repository in repositories:
+        languages = get_repository_languages(username, repository, access_token)
+        repositories_data[repository] = {
+            'language': languages
+        }
+
+    return repositories_data
+
+def extract_user_profile_info(github_url, access_token):
+    username = github_url.rstrip('/').rsplit('/', 1)[-1]
+    user_info_all = get_github_user_profile_info(username, access_token)
+    if user_info_all == '':
+        user_info = {}
+    else:
+        user_info = {
+        "name": user_info_all.get("name", ""),
+        "followers": user_info_all.get("followers", 0),
+        "following": user_info_all.get("following", 0),
+        "total_private_repos": user_info_all.get("total_private_repos", 0),
+        "owned_private_repos": user_info_all.get("owned_private_repos", 0),
+        "public_repos": user_info_all.get("public_repos", 0),
+        "public_gists": user_info_all.get("public_gists", 0)
+    }
+    return user_info
+
+def github_collaborators_commit_count(gitHubUrl):
+    return extract_contributors_commits_count(gitHubUrl, github_access_token)
 
 def github_collaborators_commit_details(gitHubUrl):
-    github_repo_url = gitHubUrl
-    github_access_token = os.getenv('GitHub_API_KEY')
+    return extract_contributors_commits_details(gitHubUrl, github_access_token)
 
-    return extract_contributors_commits_details(github_repo_url, github_access_token)
+def github_organization_languages(gitHubUrl): 
+    return extract_repository_languages(gitHubUrl, github_access_token)
+
+def github_user_profile_info(gitHubUrl):
+    return extract_user_profile_info(gitHubUrl, github_access_token)
+    
