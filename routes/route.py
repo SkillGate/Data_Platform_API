@@ -4,6 +4,7 @@ from schema.gitHubSchemas import github_collaborators_commit_count
 from schema.gitHubSchemas import github_collaborators_commit_details
 from schema.gitHubSchemas import github_organization_languages
 from schema.gitHubSchemas import github_user_profile_info
+from schema.gitHubSchemas import get_github_project_details
 from schema.mediumBlogSchemas import extract_blogger_posts
 # from config.database import collection_name
 
@@ -46,6 +47,14 @@ async def upload_file(gitHubUrl: str = Query(..., description="Description of pa
         return result
     except Exception as e:
         raise HTTPException(status_code=404, detail="User not found")
+    
+@router.get("/github/projects")
+async def blogger_post(gitHubUrl: str = Query(..., description="Description of param1")):
+    try:
+        result = get_github_project_details(gitHubUrl)
+        return result
+    except Exception as e:
+        return {"error": str(e)}
     
 @router.get("/blogger/posts")
 async def blogger_post(bloggerUrl: str = Query(..., description="Description of param1")):
