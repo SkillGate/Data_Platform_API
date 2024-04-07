@@ -182,6 +182,84 @@ def extract_user_profile_info(github_url, access_token):
     }
     return user_info
 
+def extract_github_project_details(repositories_data):
+    data = {"repositories": []}
+
+    for repository_name, repository_data in repositories_data.items():
+
+        languages = repository_data.get('languages', [])
+        contributors_data = repository_data.get('contributors', {})
+
+        repository_info = {"reponame": repository_name, "languages": languages, "contributors": []}
+
+        for contributor_username, stats in contributors_data.items():
+            contributor_data = {
+                "username": contributor_username,
+                "commit_count": stats['commit_count'],
+                "commit_details": []
+            }
+
+            for commit_sha, commit_details in stats['commit_details'].items():
+                commit_name = commit_details['commit']['message']
+                commit_data = commit_details['commit']['committer']['date']
+                stats = commit_details.get('stats', {})
+                total_lines_changed = stats.get('total', 0)
+                additions_lines_changed = stats.get('additions', 0)
+                deletions_lines_changed = stats.get('deletions',0)
+
+                commit_data = {
+                    "commit_name": commit_name,
+                    "commit_data": commit_data,
+                    "lines_changed": total_lines_changed,
+                    "additions_lines_changed": additions_lines_changed,
+                    "deletions_lines_changed": deletions_lines_changed,
+                    "commit_sha": commit_sha
+                }
+                contributor_data["commit_details"].append(commit_data)
+
+            repository_info["contributors"].append(contributor_data)
+
+        data["repositories"].append(repository_info)
+
+    return data
+
+def get_github_project_details(gitHubUrl):
+    username, repo = extract_username_repo(gitHubUrl)
+    repositories_data = {}
+    if repo == '':
+        repositories = get_organization_repositories(username, github_access_token)
+    else:
+        repositories = [repo]
+
+    for repository in repositories:
+        repository_data = {}
+        contributors_data = {}
+        contributors = get_contributors(username, repository, github_access_token)
+
+        for contributor in contributors:
+            contributor_username = contributor['login']
+            commits = get_commits(username, repository, contributor_username, github_access_token)
+
+            commit_details = {}
+
+            for commit in commits:
+                commit_sha = commit['sha']
+                commit_details[commit_sha] = get_commit_details(username, repository, commit_sha, github_access_token)
+
+            contributors_data[contributor_username] = {
+                'commit_count': len(commits),
+                'commit_details': commit_details,
+            }
+
+        languages = get_repository_languages(username, repository, github_access_token)
+        repository_data['languages'] = languages
+        repository_data['contributors'] = contributors_data
+        
+        repositories_data[repository] = repository_data
+
+    result = extract_github_project_details(repositories_data)  
+    return result
+
 def github_collaborators_commit_count(gitHubUrl):
     return extract_contributors_commits_count(gitHubUrl, github_access_token)
 
@@ -193,4 +271,3 @@ def github_organization_languages(gitHubUrl):
 
 def github_user_profile_info(gitHubUrl):
     return extract_user_profile_info(gitHubUrl, github_access_token)
-    
