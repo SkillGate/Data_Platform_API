@@ -3,3 +3,5 @@ fastapi.socketio==0.0.10
 uvicorn==0.29.0
 requests==2.26.0
 python-dotenv==0.15.0
+bs4==0.0.1
+
