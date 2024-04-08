@@ -4,7 +4,7 @@ from fastapi.responses import HTMLResponse
 
 app = FastAPI()
 
-app.include_router(router)
+# app.include_router(router)
 
 html = f"""
 <!DOCTYPE html>
@@ -14,7 +14,7 @@ html = f"""
     </head>
     <body>
         <div class="bg-gray-200 p-4 rounded-lg shadow-lg">
-            hello world
+            wellcome
         </div>
     </body>
 </html>
