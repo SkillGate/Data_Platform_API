@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, __version__
 from routes.route import router
 
 app = FastAPI()
