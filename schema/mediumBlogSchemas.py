@@ -1,6 +1,8 @@
 import os
 import requests
 from dotenv import load_dotenv
+import requests
+from bs4 import BeautifulSoup
 
 load_dotenv()
 
@@ -34,8 +36,8 @@ api_key = os.getenv('Blogger_API_KEY')
 
 def extract_blogger_posts(bloggerUrl):
 
+    result = {'blog type': 'Blogger', 'posts': []}
     blog_details = get_blog_details_by_url(bloggerUrl, api_key)
-    extracted_data = [] 
 
     if blog_details:
         blog_id = blog_details['id']
@@ -49,13 +51,49 @@ def extract_blogger_posts(bloggerUrl):
                 updated_date = post['updated']
                 url = post['url']
 
-                post_data = {
+                post = {
                     "title": title,
                     "published_date": published_date,
                     "updated_date": updated_date,
                     "url": url
                 }
 
-                extracted_data.append(post_data) 
+                result['posts'].append(post)
 
-    return extracted_data
+    return result
+
+def extract_medium_posts(mediumUrl):
+
+    result = {'blog type': 'Medium', 'posts': []}
+    response = requests.get(mediumUrl)
+
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        container = soup.find('div', class_='l ae')
+
+        if container:
+            articles = container.find_all('article')
+
+            for index, article in enumerate(articles):
+
+                post = {}
+
+                title = article.find('h2', class_='be lq lr dq ls lt lu lv ds lw lx ly lz ma mb mc md me mf mg mh mi mj mk ml mm mn hb hd he hg hi bj').text.strip()
+                post['title'] = title
+                date = article.find('p', class_='be b bf z dn').find('span', class_='').text.strip()
+                post['date'] = date
+                blogurl = article.find('div', class_='ab q').find('a', class_='').get('href')
+                endindex = blogurl.find('?')
+                base_url = mediumUrl + blogurl[:endindex]
+                post['url'] = base_url
+
+                result['posts'].append(post)
+
+        else:
+            print("Error: Unable to find the container for articles")
+    else:
+        print(f"Error: Failed to fetch page (status code {response.status_code})")
+        print(response.content)  
+
+    return result;
