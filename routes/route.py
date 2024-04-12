@@ -59,7 +59,7 @@ async def blogger_post(gitHubUrl: str = Query(..., description="Description of p
         return {"error": str(e)}
     
 @router.get("/blog/posts")
-async def blogger_post(blogUrl: str = Query(..., description="Description of param1")):
+def blogger_post(blogUrl: str = Query(..., description="Description of param1")):
     try:
         if 'medium' in blogUrl.lower():
             result = extract_medium_posts(mediumUrl=blogUrl)
