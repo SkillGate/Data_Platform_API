@@ -8,6 +8,8 @@ from schema.gitHubSchemas import get_github_project_details
 from schema.mediumBlogSchemas import extract_blogger_posts
 from schema.mediumBlogSchemas import extract_medium_posts
 from schema.LinkedInSchemas import extract_linkedIn_skills_and_recommendation_data
+from schema.LinkedInSchemas import extract_linkedIn_skills
+from schema.LinkedInSchemas import extract_linkedIn_recommendations
 # from config.database import collection_name
 
 
@@ -74,6 +76,22 @@ def blogger_post(blogUrl: str = Query(..., description="Description of param1"))
 def blogger_post(linkedInUrl: str = Query(..., description="Description of param1")):
     try:
         result = extract_linkedIn_skills_and_recommendation_data(linkedInUrl=linkedInUrl)
+        return result
+    except Exception as e:
+        return {"error": str(e)}
+    
+@router.get("/linkedIn/skills")
+def blogger_post(linkedInUrl: str = Query(..., description="Description of param1")):
+    try:
+        result = extract_linkedIn_skills(linkedInUrl=linkedInUrl)
+        return result
+    except Exception as e:
+        return {"error": str(e)}
+    
+@router.get("/linkedIn/recommendations")
+def blogger_post(linkedInUrl: str = Query(..., description="Description of param1")):
+    try:
+        result = extract_linkedIn_recommendations(linkedInUrl=linkedInUrl)
         return result
     except Exception as e:
         return {"error": str(e)}
