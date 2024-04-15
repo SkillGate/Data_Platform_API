@@ -10,6 +10,7 @@ from schema.mediumBlogSchemas import extract_medium_posts
 from schema.LinkedInSchemas import extract_linkedIn_skills_and_recommendation_data
 from schema.LinkedInSchemas import extract_linkedIn_skills
 from schema.LinkedInSchemas import extract_linkedIn_recommendations
+from schema.gitHubSchemas import github_repositories
 # from config.database import collection_name
 
 
@@ -56,6 +57,15 @@ async def upload_file(gitHubUrl: str = Query(..., description="Description of pa
 async def blogger_post(gitHubUrl: str = Query(..., description="Description of param1")):
     try:
         result = get_github_project_details(gitHubUrl)
+        return result
+    except Exception as e:
+        return {"error": str(e)}
+    
+@router.get("/github/projectRepos")
+async def blogger_post(gitHubUrl: str = Query(..., description="Description of param1")):
+    print("github repositories")
+    try:
+        result = github_repositories(gitHubUrl)
         return result
     except Exception as e:
         return {"error": str(e)}

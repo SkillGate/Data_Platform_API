@@ -271,3 +271,12 @@ def github_organization_languages(gitHubUrl):
 
 def github_user_profile_info(gitHubUrl):
     return extract_user_profile_info(gitHubUrl, github_access_token)
+
+def github_repositories(gitHubUrl):
+    username, repo = extract_username_repo(gitHubUrl)
+    
+    if repo == '':
+        repositories = get_organization_repositories(username, github_access_token)
+    else:
+        repositories = [repo]
+    return repositories
