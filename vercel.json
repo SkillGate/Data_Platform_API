@@ -6,7 +6,7 @@
       "config": { "maxLambdaSize": "15mb", "runtime": "python3.9" }
     }
   ],
-  
+
   "routes": [
     { "src": "/", "dest": "main.py" },
     { "src": "/github/collaboratorsCommitCount", "dest": "main.py" },
@@ -14,6 +14,7 @@
     { "src": "/github/organizationLanguages", "dest": "main.py" },
     { "src": "/github/userInfo", "dest": "main.py" },
     { "src": "/github/projects", "dest": "main.py" },
+    { "src": "/github/projectRepos", "dest": "main.py" },
     { "src": "/blog/posts", "dest": "main.py" },
     { "src": "/linkedIn/skills", "dest": "main.py" },
     { "src": "/linkedIn/recommendations", "dest": "main.py" },
