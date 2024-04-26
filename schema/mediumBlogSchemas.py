@@ -74,19 +74,20 @@ def extract_medium_posts(mediumUrl):
 
         if container:
             articles = container.find_all('article')
-
+           
             for index, article in enumerate(articles):
 
                 post = {}
-
-                title = article.find('h2', class_='be lq lr dq ls lt lu lv ds lw lx ly lz ma mb mc md me mf mg mh mi mj mk ml mm mn hb hd he hg hi bj').text.strip()
+                
+                title = article.find('h2', class_='be lz ma mb mc md me mf mg mh mi mj mk ml mm mn mo mp mq mr ms mt mu mv mw mx my hb hd he hg hi bj').text.strip()
                 post['title'] = title
-                date = article.find('p', class_='be b bf z dn').find('span', class_='').text.strip()
+                date = article.find("div", class_="nc nd ne nf ng ab q").find_all("span")[-1].text.strip()
                 post['date'] = date
-                blogurl = article.find('div', class_='ab q').find('a', class_='').get('href')
+                blogurl = article.find('div', class_='h k').find('a', class_='af ag ah ai aj ak al am an ao ap aq ar as at').get('href')
                 endindex = blogurl.find('?')
                 base_url = mediumUrl + blogurl[:endindex]
                 post['url'] = base_url
+                print(base_url)
 
                 result['posts'].append(post)
 
@@ -95,5 +96,7 @@ def extract_medium_posts(mediumUrl):
     else:
         print(f"Error: Failed to fetch page (status code {response.status_code})")
         print(response.content)  
+
+    print(result)
 
     return result;
