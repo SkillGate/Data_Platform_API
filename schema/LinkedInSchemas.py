@@ -61,7 +61,7 @@ def extract_linkedIn_skills(linkedInUrl):
                 skill_dict['endorsed'] = endorsed_div.find('span', class_='').text.strip()
                 
 
-            utilize_div = div.find('div', class_='khASWAMAqDUIfqognUbCjfIAEAvZPgtM inline-show-more-text--is-collapsed inline-show-more-text--is-collapsed-with-line-clamp full-width')
+            utilize_div = div.find('div', class_='PEEijEvVHiwJqBBeMYIsBNXeVOxmrXcLGE inline-show-more-text--is-collapsed inline-show-more-text--is-collapsed-with-line-clamp full-width')
             if utilize_div:
                 skill_dict['utilize'] = utilize_div.find('span', class_='').text.strip()
 
@@ -87,7 +87,6 @@ def extract_linkedIn_recommendations(linkedInUrl):
     button.click()
 
     profile_url = linkedInUrl
-    skill_url = profile_url + '/details/skills/'
     recommendation_url = profile_url
 
     driver.get(recommendation_url)
@@ -99,7 +98,7 @@ def extract_linkedIn_recommendations(linkedInUrl):
     recommendations_list = []
 
     section_elements = soup.find_all('section')
-
+    print(section_elements)
     for section in section_elements:
         
         recommendations_div = section.find('div', id='recommendations')
@@ -108,14 +107,14 @@ def extract_linkedIn_recommendations(linkedInUrl):
             recieved_rec_section = section.find('div', class_='artdeco-tabpanel active ember-view')
             rec_elements = recieved_rec_section.find_all('div', class_='display-flex flex-column full-width align-self-center')
             for rec in rec_elements:
-
+                print(rec)
                 rec_dict = {}
 
                 name_div = rec.find('div', class_='display-flex align-items-center mr1 hoverable-link-text t-bold')
                 if name_div:
                     rec_dict['name'] = name_div.find('span').text.strip()
 
-                description_div = rec.find('div', class_='pv-shared-text-with-see-more full-width t-14 t-normal t-black display-flex align-items-center')
+                description_div = rec.find('div', class_='sQMsmklQenCdtUbauBOumjhpeyIVajOkOeo inline-show-more-text--is-collapsed inline-show-more-text--is-collapsed-with-line-clamp full-width')
                 if description_div:
                     rec_dict['description'] = description_div.find('span').text.strip()
 
