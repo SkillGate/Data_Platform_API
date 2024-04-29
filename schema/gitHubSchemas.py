@@ -8,6 +8,8 @@ from constants.gitHubConstants import get_commits
 from constants.gitHubConstants import get_organization_repositories
 from constants.gitHubConstants import get_repository_languages
 from constants.gitHubConstants import get_github_user_profile_info
+import json
+import time
 
 load_dotenv()
 github_access_token = os.getenv('GitHub_API_KEY')
@@ -223,6 +225,43 @@ def extract_github_project_details(repositories_data):
 
     return data
 
+# def get_github_project_details(gitHubUrl):
+#     username, repo = extract_username_repo(gitHubUrl)
+#     repositories_data = {}
+#     if repo == '':
+#         repositories = get_organization_repositories(username, github_access_token)
+#     else:
+#         repositories = [repo]
+
+#     for repository in repositories:
+#         repository_data = {}
+#         contributors_data = {}
+#         contributors = get_contributors(username, repository, github_access_token)
+
+#         for contributor in contributors:
+#             contributor_username = contributor['login']
+#             commits = get_commits(username, repository, contributor_username, github_access_token)
+
+#             commit_details = {}
+
+#             for commit in commits:
+#                 commit_sha = commit['sha']
+#                 commit_details[commit_sha] = get_commit_details(username, repository, commit_sha, github_access_token)
+
+#             contributors_data[contributor_username] = {
+#                 'commit_count': len(commits),
+#                 'commit_details': commit_details,
+#             }
+
+#         languages = get_repository_languages(username, repository, github_access_token)
+#         repository_data['languages'] = languages
+#         repository_data['contributors'] = contributors_data
+        
+#         repositories_data[repository] = repository_data
+
+#     result = extract_github_project_details(repositories_data)  
+#     return result
+
 def get_github_project_details(gitHubUrl):
     username, repo = extract_username_repo(gitHubUrl)
     repositories_data = {}
@@ -232,6 +271,7 @@ def get_github_project_details(gitHubUrl):
         repositories = [repo]
 
     for repository in repositories:
+        
         repository_data = {}
         contributors_data = {}
         contributors = get_contributors(username, repository, github_access_token)
@@ -255,10 +295,8 @@ def get_github_project_details(gitHubUrl):
         repository_data['languages'] = languages
         repository_data['contributors'] = contributors_data
         
-        repositories_data[repository] = repository_data
+        yield json.dumps(extract_github_project_details({repository: repository_data}))
 
-    result = extract_github_project_details(repositories_data)  
-    return result
 
 def github_collaborators_commit_count(gitHubUrl):
     return extract_contributors_commits_count(gitHubUrl, github_access_token)

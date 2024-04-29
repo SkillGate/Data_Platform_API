@@ -1,4 +1,5 @@
-from fastapi import APIRouter, HTTPException, Request, Query
+from fastapi import APIRouter, HTTPException, Request, Query, Response
+from fastapi.responses import StreamingResponse
 # from schema.schemas import affindaPDF
 from schema.gitHubSchemas import github_collaborators_commit_count
 from schema.gitHubSchemas import github_collaborators_commit_details
@@ -11,6 +12,9 @@ from schema.LinkedInSchemas import extract_linkedIn_skills_and_recommendation_da
 from schema.LinkedInSchemas import extract_linkedIn_skills
 from schema.LinkedInSchemas import extract_linkedIn_recommendations
 from schema.gitHubSchemas import github_repositories
+from typing import Generator
+import json
+import time
 # from config.database import collection_name
 
 
@@ -53,13 +57,19 @@ async def upload_file(gitHubUrl: str = Query(..., description="Description of pa
     except Exception as e:
         raise HTTPException(status_code=404, detail="User not found")
     
+# @router.get("/github/projects")
+# async def blogger_post(gitHubUrl: str = Query(..., description="Description of param1")):
+#         try:
+#             result = get_github_project_details(gitHubUrl)
+#             return result
+#         except Exception as e:
+#             return {"error": str(e)}
+
 @router.get("/github/projects")
 async def blogger_post(gitHubUrl: str = Query(..., description="Description of param1")):
-    try:
-        result = get_github_project_details(gitHubUrl)
-        return result
-    except Exception as e:
-        return {"error": str(e)}
+    response = StreamingResponse(get_github_project_details(gitHubUrl), media_type="application/json")
+    response.headers["Transfer-Encoding"] = "chunked"
+    return response
     
 @router.get("/github/projectRepos")
 async def blogger_post(gitHubUrl: str = Query(..., description="Description of param1")):
@@ -109,3 +119,14 @@ def blogger_post(linkedInUrl: str = Query(..., description="Description of param
 @router.get("/")
 def hello():
     return "Hello Ashani"
+
+def generate_data():
+    for i in range(10):
+        yield json.dumps({"index": i, "message": "This is message {}".format(i)}) + '\n'
+        time.sleep(1)  # Simulate some delay between each data item
+
+@router.get("/stream")
+async def stream_data():
+    response = StreamingResponse(content=generate_data(), media_type="application/json")
+    response.headers["Transfer-Encoding"] = "chunked"
+    return response
