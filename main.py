@@ -11,6 +11,6 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000", "https://data-platform-api.vercel.app"],  # Adjust as needed for your setup
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
