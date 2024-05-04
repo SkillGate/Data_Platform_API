@@ -76,7 +76,8 @@ async def blogger_post(gitHubUrl: str = Query(..., description="Description of p
     print("github repositories")
     try:
         result = github_repositories(gitHubUrl)
-        return result
+        response = Response(content=result, headers={"Access-Control-Allow-Origin": "*"})
+        return response
     except Exception as e:
         return {"error": str(e)}
     
