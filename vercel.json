@@ -19,5 +19,11 @@
     { "src": "/linkedIn/skills", "dest": "main.py" },
     { "src": "/linkedIn/recommendations", "dest": "main.py" },
     { "src": "/linkedIn/skillsandRecommendations", "dest": "main.py" }
-  ]
+  ],
+
+  "crons": [{
+    "path": "/api/cron",
+    "schedule": "0 10 * * *"
+  }]
+
 }
